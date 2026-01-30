@@ -7,7 +7,10 @@ ENV PYTHONUNBUFFERED 1
 # RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
 #    && rm -rf /tmp/pip-tmp
 
-# Installs system dependencies required for PostgreSQL and Graphviz, and cleans up to reduce image size
+
+# Elimina el repositorio de Yarn si existe
+RUN rm -f /etc/apt/sources.list.d/yarn.list
+# Instala dependencias del sistema requeridas para PostgreSQL y Graphviz, y limpia para reducir el tamaño de la imagen
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 && apt-get -y install --no-install-recommends \
    postgresql-client \
