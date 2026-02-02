@@ -92,12 +92,48 @@ def get_all_user_favorites(user_id):
     }), 200
 
 
+@app.route('/users', methods=['POST'])
+def create_user():
+    # 1. Obtenemos los datos del Body
+    data = request.get_json()
+    # 2. Instanciamos el modelo directamente con los datos recibidos
+    new_user = User(
+        email=data["email"],
+        username=data["username"],
+        password=data["password"],
+        firstname=data.get("firstname"),
+        lastname=data.get("lastname")
+    )
+    # 3. Añadimos y guardamos sin comprobación manual
+    db.session.add(new_user)
+    db.session.commit()
+    # 4. Retornamos el resultado serializado
+    return jsonify(new_user.serialize()), 201
+
 @app.route('/favorite/people/<int:people_id>', methods=['POST'])
 def add_fav_people(user_id, people_id):
     new_favorite = Favorites_People(user_id=user_id, people_id=people_id)
     db.session.add(new_favorite)
     db.session.commit()
     return jsonify({"msg": "Personaje favorito añadido"}), 201
+
+
+@app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
+def add_fav_planet(user_id, planet_id):
+    new_favorite = Favorites_Planets(user_id=user_id, people_id=planet_id)
+    db.session.add(new_favorite)
+    db.session.commit()
+    return jsonify({"msg": "Planeta favorito añadido"}), 201
+
+
+@app.route('/favorite/people/<int:people_id>', methods=['DELETE'])
+def delete_fav_people(favorite_id):
+    favorite = db.session.get(Favorites_People, favorite_id)
+    if favorite is None:
+        return jsonify({"msg": "Favorito no encontrado"}), 404
+    db.session.delete(favorite)
+    db.session.commit()
+    return jsonify({"msg": "Personaje favorito eliminado"}), 200
 
 
 @app.route('/favorite/planet/<int:favorite_id>', methods=['DELETE'])
